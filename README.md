@@ -1,6 +1,11 @@
 NCSU-Low-Power-RFID
 ===================
 
+Joshua Stevens
+Burton Younts
+Scott Johnson
+
+
 Verilog code for a low power RFID chip that will communicate with I2C sensors.
 
 We are using Modelsim to compile: <br>
