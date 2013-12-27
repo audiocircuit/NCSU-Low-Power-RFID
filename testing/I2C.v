@@ -1,27 +1,26 @@
 module I2C(
-input wire [6:0]Address,
-input wire [7:0] Register, 
-input wire Clk,  
-input wire Mode,
-input wire Start,
-input wire Stop,
-input wire Reset,
-output reg Ack,
-output reg [7:0] Out, 
+input wire [6:0] address,
+input wire [7:0] register, 
+input wire clk,  
+input wire mode,
+input wire en,
+input wire reset,
+output reg ack,
+output reg [7:0] out, 
 inout wire Sda,
-inout wire Scl
+inout wire scl
 );
 
-reg [2:0]state;
-reg [4:0]counter;
+reg [2:0] state;
+reg [4:0] counter;
 reg sda;
 
-assign Scl = (Start) ? Clk: 1'bz;
+assign scl = (en == 1) ? clk: 1'bz;
 assign Sda = sda;
 
-always@(posedge Clk)
+always@(posedge clk)
   begin	
-    if(~Reset)
+    if(~reset)
       begin
         state <= 0;
         counter <= 5'bx;
@@ -31,20 +30,20 @@ always@(posedge Clk)
         case(state)
           0:
             begin
-              if(Start == 1)
+              if(en == 1)
                 begin
                   sda <= 1'b0;
                   state <= 1;
-                  Ack <= 1'bx;
-                  Out <= 8'bx;
+                  ack <= 1'bx;
+                  out <= 8'bx;
                   counter <= 0;
                 end
               else
                 begin
                   sda <= 1'bz;
                   state <= 0;
-                  Ack <= 1'bx;
-                  Out <= 8'bx; 
+                  ack <= 1'bx;
+                  out <= 8'bx; 
                   counter <= 5'bx;
                 end
             end
@@ -52,32 +51,39 @@ always@(posedge Clk)
             begin
               if(counter < 7)
                 begin
-                  sda <= Address[6-counter];
+                  sda <= address[6-counter];
                   state <= 1;
-                  Ack <= 1'bx;
-                  Out <= 8'bx;
+                  ack <= 1'bx;
+                  out <= 8'bx;
                   counter <= counter + 1;
                 end
               else
                 begin
-                  sda <= Mode;
+                  sda <= mode;
                   state <= 2;
-                  Ack <= 1'bx;
-                  Out <= 8'bx; 
+                  ack <= 1'bx;
+                  out <= 8'bx; 
                   counter <= 5'bx;
                 end
             end
           2:
             begin
-              if(Start)
-                begin
-                  sda <= 1'bz;
-                  state <= 0;
-                  Ack <= sda;
-                  Out <= 8'bx;
-                  counter <= 0;
-                end
+               sda <= 1'bz;
+               state <= 3;
+               ack <= 1'bx;
+               out <= 8'bx;
+               counter <= 0;
             end
+          3:
+            begin
+               sda <= 1'bx;
+               state <= 3;
+               ack <= sda;
+               out <= 8'bx;
+               counter <= 0;
+            end
+
+
 
 
 
@@ -90,43 +96,36 @@ endmodule
 
 
 module testbench();
-  reg [6:0]Address;
-  reg [7:0] Register; 
-  reg Clk;
-  reg Mode;
-  reg Start;
-  reg Stop;
-  reg Reset;
-  wire Ack;
-  wire [7:0] Out; 
-  wire Sda;
-  wire Scl;
+  reg [6:0] address;
+  reg [7:0] register; 
+  reg clk;
+  reg mode;
+  reg en;
+  reg reset;
+  wire ack;
+  wire [7:0] aut; 
+  wire sda;
+  wire scl;
 
-I2C u1 (Address, Register, Clk, Mode, Start, Stop, Reset, Ack, Out, Sda, Scl);
+I2C u1 (address, register, clk, mode, en, reset, ack, out, sda, scl);
 
   always
     begin
-      #5 Clk = ~Clk;
+      #5 clk = ~clk;
     end
 
   initial
     begin
-      Address = 7'b1110000;
-      Register = 8'b00001111;
-      Clk = 1;
-      Mode = 0;
-      Start = 0;
-      Stop = 0;
-      Reset = 0;
+      address = 7'b1110000;
+      register = 8'b00001111;
+      clk = 1;
+      mode = 0;
+      en = 0;
+      reset = 0;
       #10
-      Reset = 1;
+      reset = 1;
       #20
-      Start = 1;
-      #10
-      Start = 0;
-
-
-
+      en = 1;
 
       #300 
       $finish;
