@@ -1,7 +1,0 @@
-define NCSIMRC	( /ncsu/cadence2010/ius/tools/inca/files/ncsimrc, ~/.ncsimrc )
-include ./hdlrun.var
-define SNAPSHOT worklib.testbench:v
-DEFINE RUNMODEDEFAULT 1
-DEFINE LIB_MAP ($LIB_MAP, + => worklib )
-define ELAB_SNAPSHOT
-define SNAPSHOT worklib.testbench:v
