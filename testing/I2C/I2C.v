@@ -152,7 +152,7 @@ module I2C(
               end
            4:
               begin
-                 if(counter < 8)
+                 if(counter < 7)
                   begin
                     state <= 4;
                     sda_enable <= 1'b0;
@@ -174,7 +174,7 @@ module I2C(
                         scl_enable <= 1'b1;
                         clk_enable <= 1'b1;
                         scl_out <= 1'b0;
-                        out <= out;
+                        out[7-counter] <= sda_in;
                         counter <= 0;
                         ack <= 1'b1;
                       end
@@ -186,7 +186,7 @@ module I2C(
                         scl_enable <= 1'b1;
                         clk_enable <= 1'b1;
                         scl_out <= 1'b0;
-                        out <= out;
+                        out[7-counter] <= sda_in;
                         counter <= 0;
                         ack <= 1'b1;
                       end 
@@ -231,13 +231,13 @@ module I2C(
                     scl_out <= 1'b1;
                     out <= out;
                     counter <= 0;
-                    ack <= 1'b1;
-                  end
+                    ack <= 1'b0;
+                  end 
                 else if( repeat_start )
                   begin
                     state <= 0;
-                    sda_enable <= 1'b0;
-                    sda_out <= 0;
+                    sda_enable <= 1'b1;
+                    sda_out <= 1;
                     scl_enable <= 1'b1;
                     clk_enable <= 1'b0;
                     scl_out <= 1'b1;
@@ -268,7 +268,7 @@ module I2C(
                 scl_out <= 1'b1;
                 out <= out;
                 counter <= 0;              
-                ack <= 1'b1;
+                ack <= 1'b0;
              end
             8:
               begin
@@ -287,7 +287,7 @@ module I2C(
                 else
                   begin
                     state <= 4;
-                    sda_enable <= 1'b1;
+                    sda_enable <= 1'b0;
                     sda_out <= 0;
                     scl_enable <= 1'b1;
                     clk_enable <= 1'b1;
@@ -302,7 +302,7 @@ module I2C(
                 state <= 15;
                 sda_enable <= 1'b0;
                 sda_out <= 0;
-                scl_enable <= 1'b1;
+                scl_enable <= 1'b0;
                 clk_enable <= 1'b0;
                 scl_out <= 1'b1;
                 out <= out;

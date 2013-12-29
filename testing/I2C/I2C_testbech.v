@@ -16,7 +16,7 @@ module I2C_testbench();
   wire sda_master, sda_slave;
   reg sda_master_reg, sda_slave_reg;
 
-  I2C u1 (address, register, clk, mode, en, reset, Start, Stop, repeat_start, out, sda, scl, ack);
+  I2C u1 (address, register, clk, mode, en, reset, Start, Stop, repeat_start, out, ack, sda, scl);
 
   always
     begin
@@ -28,9 +28,9 @@ module I2C_testbench();
       address = 7'b1110000;
       register = 8'b10110010;
       clk = 1;
-      mode = 0;
+      mode = 1;
       en = 0;
-      Stop = 1;
+      Stop = 0;
       Start = 0;
       reset = 0;
       repeat_start = 0;
