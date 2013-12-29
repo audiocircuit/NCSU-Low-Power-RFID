@@ -11,11 +11,12 @@ module I2C_testbench();
   wire [7:0] aut; 
   tri0 sda;
   wire scl;
+  wire ack;
   
   wire sda_master, sda_slave;
   reg sda_master_reg, sda_slave_reg;
 
-  I2C u1 (address, register, clk, mode, en, reset, Start, Stop, repeat_start, out, sda, scl);
+  I2C u1 (address, register, clk, mode, en, reset, Start, Stop, repeat_start, out, sda, scl, ack);
 
   always
     begin
