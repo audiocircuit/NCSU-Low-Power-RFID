@@ -8,8 +8,7 @@ module I2C(
   input wire Start,
   input wire Stop,
   input wire repeat_start,
-  output wire ack,
-  output reg [7:0] out, 
+  output reg [7:0] out,
   inout wire sda,
   inout wire scl
 );
@@ -24,7 +23,6 @@ module I2C(
   assign sda_in = sda;
   assign scl = ( scl_enable ) ?  ( clk_enable ) ? clk :  scl_out : 1'bZ;
   assign scl_in = scl;
-  assign ack = sda;
 
   always@( posedge clk )
     begin
