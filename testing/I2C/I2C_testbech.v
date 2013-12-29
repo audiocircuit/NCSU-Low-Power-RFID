@@ -28,12 +28,12 @@ module I2C_testbench();
       address = 7'b1110000;
       register = 8'b10110010;
       clk = 1;
-      mode = 1;
+      mode = 0;
       en = 0;
-      Stop = 0;
+      Stop = 1;
       Start = 0;
       reset = 0;
-      repeat_start = 1;
+      repeat_start = 0;
       #10
       reset = 1;
       #20

@@ -29,14 +29,14 @@ module I2C(
     begin
       if( ~reset )
         begin
-          state = 0;
+          state <= 0;
           sda_enable <= 0;
           sda_out <= 0;
           scl_enable <= 0;
           clk_enable <= 0;
           scl_out <= 0;
           out <= 0;
-          counter <= 5'bx;
+          counter <= 0;
           ack <= 1'b0;
         end
       else
@@ -58,14 +58,14 @@ module I2C(
                   end
                 else
                   begin
-                    state <= 1'b0;
+                    state <= 0;
                     sda_enable <= 1'b0;
                     sda_out <= 1'b0;
                     scl_enable <= 1'b0;
                     clk_enable <= 1'b0;
                     scl_out <= 1'b0;
                     out <= out;
-                    counter <= counter;
+                    counter <= 0;
                     ack <= 1'b0;
                   end
               end
@@ -268,7 +268,7 @@ module I2C(
                 scl_out <= 1'b1;
                 out <= out;
                 counter <= 0;              
-                ack <= 1'b0;
+                ack <= 1'b1;
              end
             8:
               begin
@@ -287,7 +287,7 @@ module I2C(
                 else
                   begin
                     state <= 4;
-                    sda_enable <= 1'b0;
+                    sda_enable <= 1'b1;
                     sda_out <= 0;
                     scl_enable <= 1'b1;
                     clk_enable <= 1'b1;
