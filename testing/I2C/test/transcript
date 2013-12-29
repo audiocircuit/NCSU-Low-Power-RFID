@@ -1,0 +1,217 @@
+# //  ModelSim SE-64 6.3d Nov 26 2007 Linux 2.6.32-431.1.2.el6.x86_64
+# //
+# //  Copyright 1991-2007 Mentor Graphics Corporation
+# //              All Rights Reserved.
+# //
+# //  THIS WORK CONTAINS TRADE SECRET AND 
+# //  PROPRIETARY INFORMATION WHICH IS THE PROPERTY
+# //  OF MENTOR GRAPHICS CORPORATION OR ITS LICENSORS
+# //  AND IS SUBJECT TO LICENSE TERMS.
+# //
+# vsim -novopt testbench1 
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+add wave sim:/testbench1/u1/*
+log -r *
+run -all
+# ** Note: $finish    : test1.v(139)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 139
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(117)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 117
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(110)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 110
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(110)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 110
+restart -f
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+run -all
+# ** Note: $finish    : test1.v(110)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 110
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# ** Error: test1.v(33): Register is illegal in left-hand side of continuous assignment
+# -- Compiling module testbench1
+# /ncsu/modelsim63/linux_x86_64/vlog failed.
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# ** Error: test1.v(33): Register is illegal in left-hand side of continuous assignment
+# -- Compiling module testbench1
+# /ncsu/modelsim63/linux_x86_64/vlog failed.
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(108)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 108
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(112)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 112
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(112)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 112
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(129)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 129
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(116)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 116
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(129)
+#    Time: 274 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 129
+vlog test1.v
+# Model Technology ModelSim SE-64 vlog 6.3d Compiler 2007.11 Nov 26 2007
+# -- Compiling module test1
+# -- Compiling module testbench1
+# 
+# Top level modules:
+# 	testbench1
+restart -f
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.testbench1
+# Loading work.testbench1
+# Refreshing /afs/unity.ncsu.edu/users/j/jasteve4/Documents/NCSU-Low-Power-RFID/testing/I2C/test/modelsim_work.test1
+# Loading work.test1
+run -all
+# ** Note: $finish    : test1.v(126)
+#    Time: 312 ns  Iteration: 0  Instance: /testbench1
+# 1
+# Break in Module testbench1 at test1.v line 126

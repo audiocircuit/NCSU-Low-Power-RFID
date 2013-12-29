@@ -11,9 +11,9 @@ inout wire Sda,
 inout wire scl
 );
 
+reg sda;
 reg [2:0] state;
 reg [4:0] counter;
-reg sda;
 
 assign scl = (en == 1) ? clk: 1'bz;
 assign Sda = sda;
@@ -76,13 +76,109 @@ always@(posedge clk)
             end
           3:
             begin
-               sda <= 1'bx;
-               state <= 3;
-               ack <= sda;
-               out <= 8'bx;
-               counter <= 0;
+              ack <= sda;
+              if(sda == 1'bz)
+                begin
+                  sda <= 1'bz;
+                  state <= 0;
+                  out <= 8'bx;
+                  counter <= 5'bx;
+                end
+             else if(sda == 1'b1)
+                begin
+                  if(mode == 1)
+                    begin
+                      out[7 - counter] <= sda;
+                      sda <= 1'bz;
+                      state <= 4;
+                      out <= 8'bx;
+                      counter <= counter + 1;
+                    end
+                  else
+                     begin
+                      sda <= register[7 - counter];
+                      state <= 5;
+                      out <= 8'bx;
+                      counter <= counter + 1;
+                    end                   
+                end
+               else if(sda == 1'b0)
+                begin
+                  sda <= 1'bz;
+                  state <= 0;
+                  out <= 8'bx;
+                  counter <= 5'bx;
+                end
             end
-
+        4:
+          begin
+            if(counter > 7)
+              begin
+                sda <= 1'bz;
+                state <= 6;
+                out <= 8'bx;
+                ack <= 1'bx;
+                counter <= 1'bx;
+                end 
+            else
+              begin
+                out[7 - counter] <= sda;
+                sda <= 1'bz;
+                state <= 4;
+                out <= 8'bx;
+                ack <= 1'bx;
+                counter <= counter + 1;
+              end
+          end
+        5:
+          begin
+            if(counter > 7)
+              begin
+                sda <= 1'bz;
+                state <= 6;
+                out <= 8'bx;
+                ack <= 1'bx;
+                counter <= 1'bx;
+                end 
+            else
+              begin
+                sda <= register[7 - counter];
+                sda <= 1'bz;
+                state <= 5;
+                out <= 8'bx;
+                ack = 1'bx;
+                counter <= counter + 1;
+              end 
+          end
+        6:
+          begin
+            ack <= sda;
+            if(sda == 1'bz)
+              begin
+                sda <= 1'bz;
+                state <= 0;
+                out <= 8'bx;
+                counter <= 1'bx;
+              end
+             else if(sda == 1'b1)
+              begin
+                sda <= 1'bz;
+                state <= 7;
+                out <= 8'bx;
+                counter <= 0;
+              end
+             else if(sda == 1'b0)
+              begin
+                sda <= 1'bz;
+                state <= 7;
+                out <= 8'bx;
+                counter <= 0;
+              end
+          end
+        7:
+          begin
+            state <= 0;
+          end
 
 
 
