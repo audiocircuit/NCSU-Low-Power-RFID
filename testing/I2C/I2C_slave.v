@@ -11,6 +11,9 @@ module I2C_slave(
   wire sda_in, scl_in;
   reg sda_enable, sda_out, start, stop;
 
+  reg [6:0] addr;
+  reg [7:0] data;
+
   assign sda = ( sda_enable ) ? sda_out : 1'bz;
   assign sda_in = sda;
 
@@ -79,7 +82,7 @@ module I2C_slave(
                     state <= 1;
                     sda_enable <= 0;
                     sda_out <= 0;
-                    addr[6-cout] <= sda;
+                    addr[6-count] <= sda;
                     data <= data;
                     count <= count +1;
                   end
@@ -158,7 +161,7 @@ module I2C_slave(
                     sda_enable <= 0;
                     sda_out <= 0;
                     addr <= addr;
-                    data[7-cout] <= sda
+                    data[7-count] <= sda;
                     count <= count + 1;
                   end
                 else          //8 bits have been received from the slave
@@ -215,3 +218,4 @@ module I2C_slave(
           endcase
         end
     end
+endmodule
