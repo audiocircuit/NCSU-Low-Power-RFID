@@ -49,6 +49,7 @@ module I2C_slave(
           sda_enable <= 0;
           sda_out <= 0;
           start <= 0;
+          count <= 0;
           stop <= 0;
         end
       else
@@ -64,25 +65,26 @@ module I2C_slave(
                     data <= data;
                     start <= 0;
                     stop <= 0;
+                    count <= 0;
                   end
                 else          //Start signal received
                   begin
                     state <= 1;
                     sda_enable <= 0;
                     sda_out <= 0;
-                    addr[6-count] <= sda;
+                    addr[7-count] <= sda;
                     data <= data;
                     count <= count + 1;
                   end
               end
             1:                //***************State 1: Check Address********************
               begin
-                if(count<6)     //only collect 7 bits that corrospond to the address
+                if(count<7)     //only collect 7 bits that corrospond to the address
                   begin
                     state <= 1;
                     sda_enable <= 0;
                     sda_out <= 0;
-                    addr[6-count] <= sda;
+                    addr[7-count] <= sda;
                     data <= data;
                     count <= count +1;
                   end
