@@ -18,17 +18,12 @@ module I2C(
   reg [4:0] counter;
 
   wire sda_in, scl_in;
-  reg sda_enable, sda_out, scl_enable, scl_out, clk_enable, sda_output;
+  reg sda_enable, sda_out, scl_enable, scl_out, clk_enable;
 
-  assign sda = ( sda_enable ) ? sda_output : 1'bz;
+  assign sda = ( sda_enable ) ? sda_out : 1'bz;
   assign sda_in = sda;
   assign scl = ( scl_enable ) ?  ( clk_enable ) ? clk :  scl_out : 1'bZ;
   assign scl_in = scl;
-  
-  always@(negedge clk)
-    begin
-      sda_output <= sda_out;
-    end
 
   always@( posedge clk )
     begin
