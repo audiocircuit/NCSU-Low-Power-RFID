@@ -1,4 +1,4 @@
-module I2C_testbench();
+module slave_testbench();
   reg [6:0] address;
   reg [7:0] register; 
   reg clk;

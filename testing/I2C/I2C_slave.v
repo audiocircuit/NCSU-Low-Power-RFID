@@ -79,7 +79,7 @@ module I2C_slave(
               end
             1:                //***************State 1: Check Address********************
               begin
-                if(count<7)     //only collect 7 bits that corrospond to the address
+                if(count<8)     //only collect 7 bits that corrospond to the address
                   begin
                     state <= 1;
                     sda_enable <= 0;
@@ -92,7 +92,7 @@ module I2C_slave(
                   begin
                     if(addr == my_addr)     //if the address is the slave address
                       begin
-                        if(!sda)    //if sda is low after transmitting the address, then we move to the read state
+                        if(sda)    //if sda is low after transmitting the address, then we move to the read state
                           begin
                             state <= 2;
                             sda_enable <= 1;    //send ACK to master to confirm address received
@@ -124,7 +124,7 @@ module I2C_slave(
               end
             2:                //***************State 2: Read Data********************
               begin
-                if(count < 7)       //send 8 bits of measurement to the master
+                if(count < 8)       //send 8 bits of measurement to the master
                   begin
                     state <= 2;
                     sda_enable <= 1;
