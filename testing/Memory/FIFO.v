@@ -17,8 +17,6 @@ module FIFO_four(
 
   assign empty = (read_pointer == write_pointer) ? 1'b1 : 1'b0;
   assign full = ((read_pointer[3:0] == write_pointer[3:0]) &&(read_pointer[4] != write_pointer[4]));
-  assign upper = write_pointer[4];
-  assign power = write_pointer[3:0];
 
   always@(posedge clk)
     begin
@@ -704,7 +702,7 @@ module FIFO_four(
     end
 endmodule
   
-
+/*
 module FIFO_testbench();
 
   reg clk;
@@ -729,33 +727,23 @@ module FIFO_testbench();
   initial
     begin
       clk = 1;
+      #20
       reset = 0;
       write = 0;
       read = 0;
-      data_in = 2;
+      data_in = 0;
       #20
-      write = 1;
       reset = 1;
+      #20
       repeat(18)
         begin
           #10
-          data_in = data_in + 1;
-        end
-      #100
-      write = 0;
-      read = 1;
-      #180
-      data_in = 6;
-      write = 1;
-      repeat(18)
-        begin
+          write = 1;
+          data_in = data_in + 2;
           #10
-          data_in = data_in + 1;
+          write = 0;
         end
-      write = 0;
-      read = 1;
-      #100
       $finish;
     end
 endmodule
-
+*/
