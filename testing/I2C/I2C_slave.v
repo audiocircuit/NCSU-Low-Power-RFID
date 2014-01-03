@@ -9,13 +9,19 @@ module I2C_slave(
 
   reg [3:0] state, count;
   wire sda_in, scl_in;
-  reg sda_enable, sda_out, start, stop;
+  reg sda_enable, sda_out, start, stop, sda_output, last_sda, last;
 
   reg [6:0] addr;
   reg [7:0] data;
 
-  assign sda = ( sda_enable ) ? sda_out : 1'bz;
+  assign sda =  ( last_sda ) ? last ? 1'bz : 1'b0 : 1'dz;
   assign sda_in = sda;
+
+  always@(negedge scl)
+    begin
+      last <= sda_out;
+      last_sda <= sda_enable;
+    end
 
   always@(negedge sda)    //if sda transitions to low while SCL is high, then this is a start condition
     begin
@@ -41,7 +47,7 @@ module I2C_slave(
         end
     end
 
-  always@(posedge scl) 
+  always@(posedge scl or negedge reset) 
     begin
       if(~reset)
         begin

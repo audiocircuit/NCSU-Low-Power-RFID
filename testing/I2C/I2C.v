@@ -16,16 +16,28 @@ module I2C(
 
   reg [3:0] state;
   reg [4:0] counter;
+  wire clk_4x;
+  wire clk_4x_offset;
 
   wire sda_in, scl_in;
-  reg sda_enable, sda_out, scl_enable, scl_out, clk_enable;
+  reg sda_enable, sda_out, scl_enable, scl_out, clk_enable, sda_output, sda_en;
 
-  assign sda = ( sda_enable ) ? sda_out : 1'bz;
+  assign sda = ( sda_en ) ? (sda_output) ? 1'bz : 1'b0 : 1'bz;
   assign sda_in = sda;
-  assign scl = ( scl_enable ) ?  ( clk_enable ) ? clk :  scl_out : 1'bZ;
+  assign scl = ( scl_enable ) ?  ( clk_enable ) ? (clk_4x_offset) ? 1'bz : 1'b0 :  scl_out : 1'bZ;
   assign scl_in = scl;
 
-  always@( posedge clk )
+  clock_divider4 clk_u1 (clk, reset, en, clk_4x); 
+  clock_divider4_offset clk_u2 (clk, reset, en, clk_4x_offset);
+
+  always@(posedge clk_4x)
+    begin
+      sda_en <= sda_enable;
+      sda_output <= sda_out;
+    end
+  
+
+  always@(posedge clk_4x_offset or negedge reset)
     begin
       if( ~reset )
         begin
@@ -49,7 +61,7 @@ module I2C(
                     state <= 1;
                     sda_enable <= 1'b1;
                     sda_out <= 1'b0;
-                    scl_enable <= 1'b1;
+                    scl_enable <= 1'b0;
                     clk_enable <= 1'b1;
                     scl_out <= 1'b0;
                     out <= out;
@@ -297,7 +309,7 @@ module I2C(
                     ack <= 1'b0;
                  end
              end
-           15:
+          15:
               begin
                 state <= 15;
                 sda_enable <= 1'b0;

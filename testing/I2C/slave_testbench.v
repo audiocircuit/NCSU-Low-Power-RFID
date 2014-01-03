@@ -18,7 +18,8 @@ module slave_testbench();
   reg[7:0] measurement;
 
   I2C u1 (address, register, clk, mode, en, reset, Start, Stop, repeat_start, out, ack, sda, scl);
-  I2C_slave u2 (address, measurement, en, reset, scl, sda);
+  //I2C_slave u2 (address, measurement, en, reset, scl, sda);
+  slave u2 (address, measurement, en, reset, scl, sda);
   pulse u3 (clk, scl, reset);
 
   always
@@ -32,20 +33,22 @@ module slave_testbench();
       register = 8'b10110010;
       measurement = 8'b11110000;
       clk = 1;
-      mode = 1;
+      mode = 0;
       en = 0;
       Stop = 0;
       Start = 0;
-      reset = 0;
-      repeat_start = 0;
-      #20
       reset = 1;
-      #20
-      en = 1;
-      Start = 1;
-      #300 
-      Stop = 1;
+      repeat_start = 0;
+      #100
+      reset = 0;
       #200
+      reset = 1;
+      en = 1;
+      #500
+      Start = 1;
+      #10000 
+      Stop = 1;
+      #2000
       $finish;
     end
 
