@@ -1,120 +1,48 @@
-module clock_divider2(
+module clock_divider(
   input wire clk,
   input wire reset,
   input wire enabled,
-  output reg clk_out
-  );
-
-  always@(posedge clk)
-    if( ~reset )
-      begin
-        clk_out <= 0;
-      end
-    else if( enabled )
-      begin
-        clk_out <= !clk_out;
-      end
-
-endmodule
-
-
-module clock_divider4(
-  input wire clk,
-  input wire reset,
-  input wire enabled,
-  output reg clk_out
+  output reg refresh_clk,
+  output reg sys_clk
   );
   
-  reg [3:0]counter; 
+  reg [8:0] counter1; 
+  reg [8:0] counter2;
+  reg [8:0] clk_divid;
 
-  always@(posedge clk)
-    if( ~reset )
-      begin
-        clk_out <= 0;
-        counter <= 0;
-      end
-    else if( enabled )
-      begin
-        if( counter < 4 )
-          begin
-            counter <= counter + 1;
-            clk_out <= clk_out;
-          end
-        else
-          begin
-            clk_out <= !clk_out;
-            counter <= 0;
-          end
-      end
-
-endmodule
-
-module clock_divider4_offset(
-  input wire clk,
-  input wire reset,
-  input wire enabled,
-  output reg clk_out
-  );
-  
-  reg [3:0]counter; 
-
-  always@(posedge clk)
-    if( ~reset )
-      begin
-        clk_out <= 1;
-        counter <= 1;
-      end
-    else if( enabled )
-      begin
-        if( counter < 4 )
-          begin
-            counter <= counter + 1;
-            clk_out <= clk_out;
-          end
-        else
-          begin
-            clk_out <= !clk_out;
-            counter <= 0;
-          end
-      end
-
-endmodule
-
-/*
-module clock_test();
-
-
-
-  reg clk;
-  reg reset;
-  reg enabled;
-  wire clk_out1;
-  wire clk_out2;
-  wire clk_out3;
-
-
-  clock_divider4 u2 (clk, reset, enabled, clk_out2);
-  clock_divider4_offset u3 (clk, reset, enabled, clk_out3);
-
-  always
+  always@(posedge clk or negedge reset)
     begin
-      #5 clk <= !clk;
+      if( ~reset )
+        begin
+          refresh_clk <= 1;
+          sys_clk <= 0;
+          counter1 <= 0;
+          counter2 <= 63;
+          clk_divid <= 127;
+        end
+      else if( enabled )
+        begin
+          clk_divid <= clk_divid;
+          if( counter1 < clk_divid )
+            begin
+              counter1 <= counter1 + 1;
+              refresh_clk <= refresh_clk;
+            end
+          else
+            begin
+              refresh_clk <= !refresh_clk;
+              counter1 <= 0;
+            end
+          if( counter2 < clk_divid )
+            begin
+              counter2 <= counter2 + 1;
+              sys_clk <= sys_clk;
+            end
+          else
+            begin
+              sys_clk <= !sys_clk;
+              counter2 <= 0;
+            end
+        end
     end
-
-  initial
-    begin
-      clk = 0;
-      reset = 0;
-      enabled = 0;
-      #20
-      reset = 1;
-      enabled = 1;
-      #600;
-      $finish;
-    end
-
-
-
 endmodule
-
-*/
