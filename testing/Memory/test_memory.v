@@ -1,3 +1,5 @@
+//`timescale 1ns/1ps
+
 module write_to_memory_testbench();
   
   wire [6:0] slave_address;        // 7 bit alave address
@@ -16,6 +18,8 @@ module write_to_memory_testbench();
   wire full;
   wire I2C_en;                    // used to enable the memory write to memory
   wire reset_I2C;                 // used to reset the I2C machine
+  wire refresh_clk;
+  wire sys_clk;
 
   reg clk;
   reg write;
@@ -25,16 +29,28 @@ module write_to_memory_testbench();
   reg [2:0] memory_number;
   reg [14:0] memory_address;
   reg [7:0] data_in;
+  reg [7:0] measurement;
+  reg en;
 
 
 
-
-
-  I2C u1 (slave_address, byte_to_be_writen, clk, I2C_mode, I2C_en, reset_I2C, I2C_start, I2C_stop, I2C_repeat_start, I2C_data_out, ack, sda, scl);
+  master u1 (slave_address, byte_to_be_writen, refresh_clk, sys_clk, 
+            I2C_mode, I2C_en, reset_I2C, I2C_start, I2C_stop, 
+            I2C_repeat_start, I2C_data_out, ack, sda, scl);
   
-  I2C_write_to_memory u2 (clk, reset, run, number_of_bytes, memory_address, FIFO_data_out, empty, ack, memory_number, FIFO_read, slave_address, byte_to_be_writen, mode, I2C_en, reset_I2C, I2C_start, I2C_stop, I2C_repeat_start, sda);
+  I2C_write_to_memory u2 (sys_clk, reset, run, number_of_bytes, 
+            memory_address, FIFO_data_out, empty, ack, memory_number, 
+            FIFO_read, slave_address, byte_to_be_writen, I2C_mode, 
+            I2C_en, reset_I2C, I2C_start, I2C_stop, I2C_repeat_start, 
+            sda);
   
-  FIFO_four u3  (clk, reset, write, FIFO_read, data_in, FIFO_data_out, full, FIFO_empty);   
+  FIFO_four u3  (sys_clk, reset, write, FIFO_read, data_in, 
+            FIFO_data_out, full, FIFO_empty);
+
+  clock_divider u4 (clk, reset, en, refresh_clk, sys_clk); 
+
+  slave u5 (slave_address, measurement, en, reset, scl, sda);
+
   always
     begin
       #5 clk <= ~clk;
@@ -45,26 +61,30 @@ module write_to_memory_testbench();
     begin
     
     clk = 1;
-    #20
+    reset = 1;
+    en = 1;
+    write = 0;
+    #200
     reset = 0;
     run = 0;
     number_of_bytes = 5;
     memory_address = 0;
     memory_number = 2;
     data_in = 0;
-    #40
+    #4000
     reset = 1;
+    #1400
     while( !full )
       begin
-        #10
+        #1000
         write = 1;
-        #10
+        #1000
         write = 0;
         data_in = data_in + 3;
       end
     write = 0;
     run = 1;
-    #100
+    #30000
 
     $finish;
     end

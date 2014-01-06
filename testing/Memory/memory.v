@@ -16,15 +16,15 @@ module I2C_write_to_memory(
   output reg reset_I2C,
   output reg Start,
   output reg Stop,
-  output reg repeat_start
-  input wire sda;
+  output reg repeat_start,
+  input wire sda
   );
 
   reg [3:0] state;
   reg [11:0] counter;
 
 
-  always@(posedge clk)
+  always@(posedge clk or negedge reset)
     begin
       if( !reset )
         begin
@@ -90,7 +90,7 @@ module I2C_write_to_memory(
               end
              2:
               begin
-                if(counter < 7)
+                if(counter < 8)
                   begin
                     state <= 2;
                     read <= 0;

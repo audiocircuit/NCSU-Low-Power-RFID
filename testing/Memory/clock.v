@@ -18,7 +18,7 @@ module clock_divider(
           sys_clk <= 0;
           counter1 <= 0;
           counter2 <= 63;
-          clk_divid <= 127;
+          clk_divid <= 100;
         end
       else if( enabled )
         begin

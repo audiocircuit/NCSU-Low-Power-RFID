@@ -18,7 +18,7 @@ module FIFO_four(
   assign empty = (read_pointer == write_pointer) ? 1'b1 : 1'b0;
   assign full = ((read_pointer[3:0] == write_pointer[3:0]) &&(read_pointer[4] != write_pointer[4]));
 
-  always@(posedge clk)
+  always@(posedge clk or negedge reset)
     begin
       if( !reset )
         begin
@@ -368,7 +368,7 @@ module FIFO_four(
         end
     end
 
-  always@(posedge clk)
+  always@(posedge clk or negedge reset)
     begin
       if( !reset )
         begin
