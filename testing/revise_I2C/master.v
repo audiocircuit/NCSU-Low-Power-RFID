@@ -1,3 +1,5 @@
+//This module controls all I2C master communication
+
 module master(
   input wire reset_n,
   input wire clk,
@@ -19,7 +21,8 @@ module master(
   reg scl_en;
   wire sda_in;
   wire scl_in;
-  
+
+  //State Parameters
   parameter WAIT = 0;
   parameter START = 1;
   parameter ADDRESS = 2;
@@ -34,38 +37,42 @@ module master(
   parameter DONE = 11;
   parameter BAD = 15;
 
+  //tri-state buffer for sda and scl
   assign sda = (sda_en) ? sda_out ? 1'bz : 1'b0 : 1'bz;
   assign sda_in = sda;
   assign scl = (scl_en) ? (clk) ? 1'bz : 1'b0 : 1'bz;
   assign scl_in = scl;
 
-  
+  //capture incomming data on SDA line
   always@(posedge clk or negedge reset_n)
     begin
-      if( !reset_n )
+      if( !reset_n )    //initializes data out to high impedence
         begin
           data_out <= 8'bz;
         end
       else 
         begin
-          if(master_state == READ_DATA)
+          if(master_state == READ_DATA) //left shifts in captured data
             begin
               data_out <= {data_out,sda_in};
             end
-          else if((master_state == READ_ACK) || (master_state == READ_NACK))
+          //when looking for or sending ACK
+          else if((master_state == READ_ACK) 
+                  || (master_state == READ_NACK))
             begin
               data_out <= data_out;
             end
-          else
+          else    //set line to high impedence
             begin
               data_out <= 8'bz;
             end
         end
     end
 
+  //Datapath for the Moore state machine
   always@(master_state or negedge reset_n or master_counter)
     begin
-      if( !reset_n )
+      if( !reset_n )  //disable all tri-state buffers
         begin
           sda_en <= 0;
           sda_out <= 0;
@@ -74,79 +81,79 @@ module master(
       else
         begin
           case( master_state )
-            WAIT:
+            WAIT:     //disable all tri-state buffers
               begin
                 sda_en <= 0;
                 sda_out <= 0;
                 scl_en <= 0; 
               end
-            START:
+            START:    //Sets start on SDA line
               begin
                 sda_en <= 1;
                 sda_out <= 0;
                 scl_en <= 0;
             end
-            ADDRESS:
+            ADDRESS:  //Sends address out SDA line
               begin
                 sda_en <= 1;
                 sda_out <= address[6 - master_counter];
                 scl_en <= 1;
               end
-            MODE:
+            MODE:     //Sends mode out SDA line
              begin
                 sda_en <= 1;
                 sda_out <= mode;
                 scl_en <= 1;
               end
-            ADDRESS_ACK:
+            ADDRESS_ACK:    //Looks for address ACK
               begin
                 sda_en <= 0;
                 sda_out <= 0;
                 scl_en <= 1;
               end
-            WRITE_DATA:
+            WRITE_DATA:     //Sends regiester MSB first
               begin
                 sda_en <= 1;
                 sda_out <= registor[7 - master_counter];
                 scl_en <= 1;
               end
-            READ_DATA:
+            READ_DATA:    //Reads data on SDA line MSB first
               begin
                 sda_en <= 0;
                 sda_out <= 0;
                 scl_en <= 1;
               end
-            WRITE_ACK:
+            WRITE_ACK:    //looks for ACK from writing data
               begin
                 sda_en <= 0;
                 sda_out <= 0;
                 scl_en <= 1;
               end
-            READ_ACK:
+            READ_ACK:     //Sends ACK after reading data
               begin
                 sda_en <= 1;
                 sda_out <= 0;
                 scl_en <= 1;
               end
-            READ_NACK:
+            READ_NACK:  //tells slave the master is done receiving data
               begin
                 sda_en <= 1;
                 sda_out <= 1;
                 scl_en <= 1;
               end
-            STOP:
+            STOP:       //begins the stop condition
               begin
                 sda_en <= 1;
                 sda_out <= 0;
                 scl_en <= 1;
               end
-            DONE:
+            DONE:       //ends the stop condition
               begin
                 sda_en <= 0;
                 sda_out <= 0;
                 scl_en <= 0;
               end
-            BAD:
+            BAD:      //fail safe for unpredictible data
               begin
                 sda_en <= 0;
                 sda_out <= 0;
@@ -156,16 +163,17 @@ module master(
         end
     end
 
+  //Control path for master I2C
   always@(negedge clk or negedge reset_n)
     begin
-      if(!reset_n)
+      if(!reset_n)  //initializes state machine
         begin
           master_state <= WAIT;
           master_counter <= 1'b0;
         end
       else
         case(master_state)
-          WAIT:
+          WAIT:     //waiting to start I2C comm
             begin
               if(start && en )
                 begin
@@ -178,12 +186,12 @@ module master(
                   master_counter <= 1'b0;
                 end
             end
-          START:
+          START:    //Begin the I2C comm
             begin
               master_state <= ADDRESS;
               master_counter <= 1'b0;
             end
-          ADDRESS:
+          ADDRESS:  //Send I2C address to slave
             begin
               if(master_counter < 6)
                 begin
@@ -196,12 +204,12 @@ module master(
                   master_counter <= 1'b0;
                 end
             end
-          MODE:
+          MODE:     //Sends read/write mode to slave
             begin
               master_state <= ADDRESS_ACK;
               master_counter <= 1'b0;
             end
-          ADDRESS_ACK:
+          ADDRESS_ACK:  //Receives Slave ACK for address
             begin
               if( !sda_in )
                 begin
@@ -222,7 +230,7 @@ module master(
                   master_counter <= 0;
                 end
             end
-          WRITE_DATA:
+          WRITE_DATA:   //Sends the slave the data on write
             begin
               if(master_counter < 7)
                 begin
@@ -235,7 +243,7 @@ module master(
                   master_counter <= 1'b0;
                 end
             end
-          WRITE_ACK:
+          WRITE_ACK:    //waits for ACK from slave on write
             begin
               if( sda_in || stop )
                 begin
@@ -248,7 +256,7 @@ module master(
                   master_counter <= 1'b0;
                 end
             end
-          READ_DATA:
+          READ_DATA:    //reads data from Slave to master
             begin
               if(master_counter < 7)
                 begin
@@ -267,32 +275,32 @@ module master(
                     master_counter <= 1'b0;
                   end
             end
-          READ_ACK:
+          READ_ACK:   //Sends ACK after receiving data from slave
             begin
               master_state <= READ_DATA;
               master_counter <= 1'b0;
             end
-          READ_NACK:
+          READ_NACK:  //Sends NACK when master is done reading data
             begin
               master_state <= STOP;
               master_counter <= 1'b0;
             end
-          STOP:
+          STOP:       //begins transmission of Stop bit
+            begin
+              master_state <= DONE;
+              master_counter <= 1'b0;
+            end 
+          DONE:       //completes transmission of Stop bit
             begin
               master_state <= DONE;
               master_counter <= 1'b0;
             end
-          DONE:
-            begin
-              master_state <= DONE;
-              master_counter <= 1'b0;
-            end
-          BAD:
+          BAD:        //State for BAD data
             begin
               master_state <= BAD;
               master_counter <= 1'b0;
             end
-          default:
+          default:    //Catch all for bad states
             begin
               master_state <= BAD;
               master_counter <= 1'b0;
@@ -303,53 +311,3 @@ module master(
 endmodule
 
 
-
-module test();
-  reg reset_n;
-  reg clk;
-  reg en;
-  reg start;
-  reg stop;
-  reg mode;
-  reg [6:0] address;
-  reg [7:0] regist;
-  reg [7:0] mess;
-  tri1 sda;
-  tri1 scl;
-  wire [7:0]data_out;
-
-  master master_test (reset_n, clk, en, start, stop, mode,
-                      address, regist, sda, scl, data_out);
-
-  slave slave_test (reset_n, en, address, mess, scl, sda);   
-
-  always
-    #5 clk <= ~clk;
-
-  initial
-    begin
-      clk = 1;
-      en = 0;
-      reset_n = 1;
-      start = 0;
-      stop = 0;
-      mode = 1;
-      address = 7'b1110000;
-      regist = 8'b11110000;
-      mess = 8'b00001111;
-      #20
-      reset_n = 0;
-      #20
-      reset_n = 1;
-      #20
-      en = 1;
-      #20
-      start = 1;
-      #400
-      start = 0;
-      stop = 1;
-      #100
-      $finish;
-    end
-
-endmodule
