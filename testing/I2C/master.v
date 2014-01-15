@@ -24,7 +24,7 @@ module master(
 
   assign sda = ( sda_en ) ? (sda_output) ? 1'bz : 1'b0 : 1'bz;
   assign sda_in = sda;
-  assign scl = ( scl_enable ) ?  ( clk_enable ) ? (sys_clk) ? 1'bz : 1'b0 :  scl_out : 1'bZ;
+  assign scl = ( scl_enable ) ?  ( clk_enable ) ? (sys_clk) ? 1'bz : 1'b0 :  scl_out : 1'bz;
   assign scl_in = scl;
 
   always@(posedge refresh_clk)
@@ -309,11 +309,11 @@ module master(
             9:
               begin
                 state <= 15;
-                sda_enable <= 1'b1;
+                sda_enable <= 1'b0;
                 sda_out <= 0;
-                scl_enable <= 1'b1;
+                scl_enable <= 1'b0;
                 clk_enable <= 1'b0;
-                scl_out <= 1'b1;
+                scl_out <= 1'b0;
                 out <= out;
                 counter <= 0;              
                 ack <= 1'b0;
@@ -325,7 +325,7 @@ module master(
                 sda_out <= 0;
                 scl_enable <= 1'b0;
                 clk_enable <= 1'b0;
-                scl_out <= 1'b1;
+                scl_out <= 1'b0;
                 out <= out;
                 counter <= 0;
                 ack <= 1'b0;
