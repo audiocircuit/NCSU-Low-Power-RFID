@@ -1,4 +1,3 @@
-
 module master(
   input wire [6:0] address,
   input wire [7:0] register, 
