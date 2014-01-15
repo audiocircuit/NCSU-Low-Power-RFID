@@ -1,4 +1,3 @@
-
 #include "Wire.h"
 #define VCNL4000Adress 0x13
 #define VCNL4000Register0 0x80
