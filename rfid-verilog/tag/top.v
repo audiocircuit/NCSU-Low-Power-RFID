@@ -23,7 +23,7 @@
 
 module top(reset, clk, demodin, modout, // regular IO
            adc_sample_ctl, adc_sample_clk, adc_sample_datain,    // adc connections
-           msp_sample_ctl, msp_sample_clk, msp_sample_datain, // msp430 connections
+           sensor_sample_ctl, sensor_sample_clk, sensor_sample_datain, // sensor connections
            uid_byte_in, uid_addr_out, uid_clk_out,
            writedataout, writedataclk, 
            use_uid, use_q, comm_enable,
@@ -49,8 +49,8 @@ module top(reset, clk, demodin, modout, // regular IO
   output adc_sample_clk, adc_sample_ctl;
 
   // MSP430 connections
-  input  msp_sample_datain;
-  output msp_sample_clk, msp_sample_ctl;
+  input  sensor_sample_datain;
+  output sensor_sample_clk, sensor_sample_ctl;
   output writedataout, writedataclk;
 
   // Debugging IO
@@ -139,19 +139,19 @@ module top(reset, clk, demodin, modout, // regular IO
   assign uidbitclk  = (bitsrcselect == BITSRC_UID ) ? txbitclk : 1'b0;
 
   // MUX connection from READ to MSP or ADC
-  wire readfrommsp;
-  wire readfromadc = !readfrommsp;
+  wire readfromsensor;
+  wire readfromadc = !readfromsensor;
   wire read_sample_ctl, read_sample_clk, read_sample_datain;
 
   // ADC connections
   assign adc_sample_ctl     = read_sample_ctl    & readfromadc;
   assign adc_sample_clk     = read_sample_clk    & readfromadc;
 
-  // MSP430 connections
-  assign msp_sample_ctl     = read_sample_ctl    & readfrommsp;
-  assign msp_sample_clk     = read_sample_clk    & readfrommsp;
+  // sensor connections
+  assign sensor_sample_ctl     = read_sample_ctl    & readfromsensor;
+  assign sensor_sample_clk     = read_sample_clk    & readfromsensor;
 
-  assign read_sample_datain = readfromadc ? adc_sample_datain : msp_sample_datain;
+  assign read_sample_datain = readfromadc ? adc_sample_datain : sensor_sample_datain;
 
   // Serial debug interface for viewing registers:
   reg [3:0] debug_address;
@@ -190,7 +190,7 @@ module top(reset, clk, demodin, modout, // regular IO
   controller U_CTL (reset, clk, rx_overflow, rx_cmd, currentrn, currenthandle,
                     packet_complete, txsetupdone, tx_done, 
                     rx_en, tx_en, docrc, handlematch,
-                    bitsrcselect, readfrommsp, readwriteptr, rx_q, rx_updn,
+                    bitsrcselect, readfromsensor, readwriteptr, rx_q, rx_updn,
                     use_uid, use_q, comm_enable);
 
   txsettings U_SET (reset, trcal_in,  m_in,  dr_in,  trext_in, query_complete,
