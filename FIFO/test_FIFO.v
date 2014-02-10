@@ -6,8 +6,12 @@ module test_FIFO();
   reg clk = 1;
   reg read = 0;
   reg write = 0;
+  reg write_ready = 0;
+  wire write_valid;
+  reg read_ready;
+  wire read_valid = 0;
   reg [7:0] data_in = 2;
-  reg [8:0] clock_divider = 10;
+  reg [8:0] clock_divider = 1;
   wire [7:0] data_out;
   wire sys_clk;
   wire empty;
@@ -24,9 +28,14 @@ module test_FIFO();
   FIFO u1 (
     reset_n,
     en,
+    clk,
     sys_clk,
     read,
     write,
+    write_valid,
+    write_ready,
+    read_valid,
+    read_ready,
     data_in,
     data_out,
     empty,
@@ -35,24 +44,26 @@ module test_FIFO();
 
   always
     begin
-      #25 
+      #5 
       clk <= ~clk;
     end
 
   initial
     begin
-      #1000
+      #10
       reset_n = 0;
       #10
       reset_n = 1;
-      #1000
-      write = 1;
+      #10
       repeat(20)
         begin
-          #1000
+          #10
+          write = 0;
           data_in = data_in + 1;
+          #10
+          write = 1;
         end
-      #100000
+      #1000
 
       $finish;
     end
