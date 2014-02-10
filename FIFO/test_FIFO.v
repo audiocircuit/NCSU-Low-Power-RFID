@@ -6,10 +6,6 @@ module test_FIFO();
   reg clk = 1;
   reg read = 0;
   reg write = 0;
-  reg write_ready = 0;
-  wire write_valid;
-  reg read_ready;
-  wire read_valid = 0;
   reg [7:0] data_in = 2;
   reg [8:0] clock_divider = 1;
   wire [7:0] data_out;
@@ -32,10 +28,6 @@ module test_FIFO();
     sys_clk,
     read,
     write,
-    write_valid,
-    write_ready,
-    read_valid,
-    read_ready,
     data_in,
     data_out,
     empty,
