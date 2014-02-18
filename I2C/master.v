@@ -70,7 +70,7 @@ module master(
     end
 
   //Datapath for the Moore state machine
-  always@(master_state or negedge reset_n or master_counter)
+  always@(master_state or reset_n or master_counter)
     begin
       if( !reset_n )  //disable all tri-state buffers
         begin
