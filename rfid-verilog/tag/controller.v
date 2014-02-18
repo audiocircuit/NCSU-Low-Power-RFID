@@ -40,7 +40,7 @@
 module controller (reset, clk, rx_overflow, rx_cmd, currentrn, currenthandle,
                    packet_complete, txsetupdone, tx_done, 
                    rx_en, tx_en, docrc, handlematch,
-                   bitsrcselect, readfrommsp, readwriteptr, rx_q, rx_updn,
+                   bitsrcselect, readfromsensor, readwriteptr, rx_q, rx_updn,
                    use_uid, use_q, comm_enable);
   
   parameter QUERYREP   = 9'b000000001;
@@ -65,14 +65,14 @@ module controller (reset, clk, rx_overflow, rx_cmd, currentrn, currenthandle,
   output rx_en, tx_en, docrc; // current_mode 0: rx mode, 1: tx mode
   output [1:0] bitsrcselect;
   input [7:0] readwriteptr;
-  output readfrommsp;
+  output readfromsensor;
   input use_uid, use_q;
   input [3:0] rx_q;
   input [2:0] rx_updn;
   input handlematch, comm_enable;
 
   reg [3:0] rx_q_reg;
-  reg readfrommsp;
+  reg readfromsensor;
   reg [15:0] storedhandle;
   reg [1:0] bitsrcselect;
   reg docrc;
@@ -149,7 +149,7 @@ module controller (reset, clk, rx_overflow, rx_cmd, currentrn, currenthandle,
       rx_q_reg  <= 0;
       slotcounter  <= 0;
       storedhandle <= 0;
-      readfrommsp  <= 0;
+      readfromsensor  <= 0;
     end else if (commstate == STATE_TX) begin
       if(txsetupdone) begin
         rx_en <= 0;
@@ -238,8 +238,8 @@ module controller (reset, clk, rx_overflow, rx_cmd, currentrn, currenthandle,
            end
            READ: begin
              if (comm_enable && handlematch) begin
-               if (readwriteptr == 0) readfrommsp <= 0;
-               else                   readfrommsp <= 1;
+               if (readwriteptr == 0) readfromsensor <= 0;
+               else                   readfromsensor <= 1;
                commstate  <= STATE_TX;
                bitsrcselect     <= bitsrcselect_ADC;
                docrc      <= 1;

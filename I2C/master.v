@@ -9,8 +9,8 @@ module master(
   input wire mode,
   input wire [6:0] address,
   input wire [7:0] registor,
-  inout reg sda,
-  inout reg scl,
+  inout wire sda,
+  inout wire scl,
   output reg [7:0]data_out
   );
 
