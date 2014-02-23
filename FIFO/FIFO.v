@@ -7,18 +7,23 @@ module FIFO(
   input wire write,
   input wire [7:0] data_in,
   output reg [7:0] data_out,
-  output wire empty,
-  output wire full
+  output reg empty,
+  output reg full
   );
 
-  reg [2:0] write_pointer;
-  reg [2:0] read_pointer;
-  reg [7:0] memory [0:7];
+  reg [3:0] write_pointer;
+  reg [3:0] read_pointer;
+  wire [3:0] next_write_pointer;
+  wire [3:0] next_read_pointer; 
+  wire [4:0] write_state;
+  wire [4:0] read_state;
+  reg [15:0] valid;
+  reg w_increment;
+  reg r_increment;
+  reg [7:0] memory [0:15];
   reg [7:0] data;
-  reg [3:0] counter;
-  reg sub, add;
 
-  /*parameter S0 = 4'b0000;
+  parameter S0 = 4'b0000;
   parameter S1 = 4'b0001;
   parameter S2 = 4'b0011;
   parameter S3 = 4'b0010;
@@ -33,45 +38,83 @@ module FIFO(
   parameter S12 = 4'b1010;
   parameter S13 = 4'b1011;
   parameter S14 = 4'b1001;
-  parameter S15 = 4'b1000;*/
+  parameter S15 = 4'b1000;
 
-  parameter S0 = 4'b000;
+  /*parameter S0 = 4'b000;
   parameter S1 = 4'b001;
   parameter S2 = 4'b011;
   parameter S3 = 4'b010;
   parameter S4 = 4'b110;
   parameter S5 = 4'b111;
   parameter S6 = 4'b101;
-  parameter S7 = 4'b100;
+  parameter S7 = 4'b100;*/
+
+  
+  gray_counter wrtie_counter(
+    .reset_n(reset_n),
+    .clk(w_clk),
+    .increment(w_increment),
+    .gray_count(next_write_pointer),
+    .count_b(write_state)
+  );
+
+  gray_counter read_counter(
+    .reset_n(reset_n),
+    .clk(r_clk),
+    .increment(r_increment),
+    .gray_count(next_read_pointer),
+    .count_b(read_state)
+  );
 
 
-  assign full = (counter == 8) ? 1'b1 : 1'b0;
-  assign empty = (counter == 0) ? 1'b1 : 1'b0;
-
-
-  always@(write_pointer or read_pointer or reset_n or add or sub)
+  always@(posedge w_clk or negedge reset_n)
     begin
       if(!reset_n)
         begin
-          counter = 0;
+          w_increment <= 1'b0;
         end
       else
         begin
-          if(sub && add)
+          if(!w_increment)
             begin
-              counter <= counter;
-            end
-          else if(sub)
-            begin
-              counter <= counter - 1;
-            end
-          else if(add)
-            begin
-              counter <= counter + 1;
+              if(write && !valid[write_pointer])
+                begin
+                  w_increment <= 1'b1;
+                end
+              else
+                begin
+                  w_increment <=  1'b0;
+                end
             end
           else
             begin
-              counter <= counter;
+              w_increment <= 1'b0;
+            end
+        end
+    end
+
+  always@(posedge r_clk or negedge reset_n)
+    begin
+      if(!reset_n)
+        begin
+          r_increment <= 1'b0;
+        end
+      else
+        begin
+          if(!r_increment)
+            begin
+              if(read && valid[read_pointer])
+                begin
+                  r_increment <= 1'b1;
+                end
+              else
+                begin
+                  r_increment <=  1'b0;
+                end
+            end
+          else
+            begin
+              r_increment <= 1'b0;
             end
         end
     end
@@ -80,234 +123,96 @@ module FIFO(
     begin
       if(!reset_n)
         begin
-          write_pointer <= S0;
-          memory[S0] <= 8'bz;
-          memory[S1] <= 8'bz;
-          memory[S2] <= 8'bz;
-          memory[S3] <= 8'bz;
-          memory[S4] <= 8'bz;
-          memory[S5] <= 8'bz;
-          memory[S6] <= 8'bz;
-          memory[S7] <= 8'bz;
+          full <= 1'b0;
+          empty <= 1'b0;
         end
       else
         begin
-          case(write_pointer)
-            S0:
-              begin
-                if(write&&!full)
-                  begin
-                    write_pointer <= S1;
-                    add <= 1;
-                  end
-                else
-                  begin
-                    write_pointer <= S0;
-                    add <= 0;
-                  end
-              end
-            S1:
-              begin
-                if(write&&!full)
-                  begin
-                    write_pointer <= S2;
-                    add <= 1;
-                  end
-                else
-                  begin
-                    write_pointer <= S1;
-                    add <= 0;
-                  end
-              end
-            S2:
-              begin
-                if(write&&!full)
-                  begin
-                    write_pointer <= S3;
-                    add <= 1;
-                  end
-                else
-                  begin
-                    write_pointer <= S2;
-                    add <= 0;
-                  end
-              end
-            S3:
-              begin
-                if(write&&!full)
-                  begin
-                    write_pointer <= S4;
-                    add <= 1;
-                  end
-                else
-                  begin
-                    write_pointer <= S3;
-                    add <= 0;
-                  end
-              end
-            S4:
-              begin
-                if(write&!full)
-                  begin
-                    write_pointer <= S5;
-                    add <= 1;
-                  end
-                else
-                  begin
-                    write_pointer <= S4;
-                    add <= 0;
-                  end
-              end
-            S5:
-              begin
-                if(write&!full)
-                  begin
-                    write_pointer <= S6;
-                    add <= 1;
-                  end
-                else
-                  begin
-                    write_pointer <= S5;
-                    add <= 0;
-                  end
-              end
-            S6:
-              begin
-                if(write&&!full)
-                  begin
-                    write_pointer <= S7;
-                    add <= 1;
-                  end
-                else
-                  begin
-                    write_pointer <= S6;
-                    add <= 0;
-                  end
-              end
-            S7:
-              begin
-                if(write&&!full)
-                  begin
-                    write_pointer <= S0;
-                    add <= 1;
-                  end
-                else
-                  begin
-                    write_pointer <= S7;
-                    add <= 0;
-                  end
-              end
-          endcase
+          full <= (write_state[3:0] == read_state[3:0]) & (write_state[4] != read_state[4]); 
+          empty <= (write_state == read_state);
         end
     end
 
-  always@(write_pointer or negedge reset_n)
-    begin
-      if(!reset_n)
-        begin
-          memory[S0] <= 8'b0;
-          memory[S1] <= 8'b0;
-          memory[S2] <= 8'b0;
-          memory[S3] <= 8'b0;
-          memory[S4] <= 8'b0;
-          memory[S5] <= 8'b0;
-          memory[S6] <= 8'b0;
-          memory[S7] <= 8'b0;
-        end
-      else
-        begin
-          case(write_pointer)
-            S0:
-              begin
-                memory[S0] <= memory[S0];
-                memory[S1] <= memory[S1];
-                memory[S2] <= memory[S2];
-                memory[S3] <= memory[S3];
-                memory[S4] <= memory[S4];
-                memory[S5] <= memory[S5];
-                memory[S6] <= memory[S6];
-                memory[S7] <= data_in;
-              end
-            S1:
-              begin
-                memory[S0] <= data_in;
-                memory[S1] <= memory[S1];
-                memory[S2] <= memory[S2];
-                memory[S3] <= memory[S3];
-                memory[S4] <= memory[S4];
-                memory[S5] <= memory[S5];
-                memory[S6] <= memory[S6];
-                memory[S7] <= memory[S7];
-              end
-            S2:
-              begin
-                memory[S0] <= memory[S0];
-                memory[S1] <= data_in;
-                memory[S2] <= memory[S2];
-                memory[S3] <= memory[S3];
-                memory[S4] <= memory[S4];
-                memory[S5] <= memory[S5];
-                memory[S6] <= memory[S6];
-                memory[S7] <= memory[S7];
-              end
-            S3:
-              begin
-                memory[S0] <= memory[S0];
-                memory[S1] <= memory[S1];
-                memory[S2] <= data_in;
-                memory[S3] <= memory[S3];
-                memory[S4] <= memory[S4];
-                memory[S5] <= memory[S5];
-                memory[S6] <= memory[S6];
-                memory[S7] <= memory[S7];
-              end
-            S4:
-              begin
-                memory[S0] <= memory[S0];
-                memory[S1] <= memory[S1];
-                memory[S2] <= memory[S2];
-                memory[S3] <= data_in;
-                memory[S4] <= memory[S4];
-                memory[S5] <= memory[S5];
-                memory[S6] <= memory[S6];
-                memory[S7] <= memory[S7];
-              end
-            S5:
-              begin
-                memory[S0] <= memory[S0];
-                memory[S1] <= memory[S1];
-                memory[S2] <= memory[S2];
-                memory[S3] <= memory[S3];
-                memory[S4] <= data_in;
-                memory[S5] <= memory[S5];
-                memory[S6] <= memory[S6];
-                memory[S7] <= memory[S7];
-              end
-            S6:
-              begin
-                memory[S0] <= memory[S0];
-                memory[S1] <= memory[S1];
-                memory[S2] <= memory[S2];
-                memory[S3] <= memory[S3];
-                memory[S4] <= memory[S4];
-                memory[S5] <= data_in;
-                memory[S6] <= memory[S6];
-                memory[S7] <= memory[S7];
-              end
-            S7:
-              begin
-                memory[S0] <= memory[S0];
-                memory[S1] <= memory[S1];
-                memory[S2] <= memory[S2];
-                memory[S3] <= memory[S3];
-                memory[S4] <= memory[S4];
-                memory[S5] <= memory[S5];
-                memory[S6] <= data_in;
-                memory[S7] <= memory[S7];
-              end
-          endcase
-        end
-    end
+    always@(next_write_pointer or negedge reset_n)
+      begin
+        if(!reset_n)
+          begin
+             memory[S0] <= 8'b0;
+             memory[S1] <= 8'b0;
+             memory[S2] <= 8'b0;
+             memory[S3] <= 8'b0;
+             memory[S4] <= 8'b0;
+             memory[S5] <= 8'b0;
+             memory[S6] <= 8'b0;
+             memory[S7] <= 8'b0;
+             memory[S8] <= 8'b0;
+             memory[S9] <= 8'b0;
+             memory[S10] <= 8'b0;
+             memory[S11] <= 8'b0;
+             memory[S12] <= 8'b0;
+             memory[S13] <= 8'b0;
+             memory[S14] <= 8'b0;
+             memory[S15] <= 8'b0;
+             write_pointer <= 8'b0;
+          end
+        else
+          begin
+            memory[write_pointer] <= data_in;
+            write_pointer <= next_write_pointer;
+          end
+      end
 
+      always@(next_read_pointer or negedge reset_n)
+        begin
+          if(!reset_n)
+            begin
+              data_out <= 8'b0;
+              read_pointer <= 8'b0;
+            end
+          else
+            begin
+              data_out <= memory[read_pointer];
+              read_pointer <= next_read_pointer;
+            end
+        end
+
+    always@(posedge r_increment or posedge w_increment or negedge reset_n)
+      begin
+        if(!reset_n)
+          begin
+            valid[S1] <= 1'b0;
+            valid[S0] <= 1'b0;
+            valid[S2] <= 1'b0;
+            valid[S3] <= 1'b0;
+            valid[S4] <= 1'b0;
+            valid[S5] <= 1'b0;
+            valid[S6] <= 1'b0;
+            valid[S7] <= 1'b0;
+            valid[S8] <= 1'b0;
+            valid[S9] <= 1'b0;
+            valid[S10] <= 1'b0;
+            valid[S11] <= 1'b0;
+            valid[S12] <= 1'b0;
+            valid[S13] <= 1'b0;
+            valid[S14] <= 1'b0;
+            valid[S15] <= 1'b0;
+          end
+        else
+          begin
+            if(r_increment == w_increment)
+              begin
+                    valid[read_pointer] <= 1'b0;
+                    valid[write_pointer] <= 1'b1;
+              end
+            else if(r_increment)
+              begin
+                valid[read_pointer] <= 1'b0;
+              end
+            else if(w_increment)
+              begin
+                valid[write_pointer] <= 1'b1;
+              end
+          end
+      end
 
 endmodule
