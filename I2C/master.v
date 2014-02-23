@@ -23,19 +23,19 @@ module master(
   wire scl_in;
 
   //State Parameters
-  parameter WAIT = 0;
-  parameter START = 1;
-  parameter ADDRESS = 2;
-  parameter MODE = 3;
-  parameter ADDRESS_ACK = 4;
-  parameter WRITE_DATA = 5;
-  parameter READ_DATA = 6;
-  parameter WRITE_ACK = 7;
-  parameter READ_ACK = 8;
-  parameter READ_NACK = 9;
-  parameter STOP = 10;
-  parameter DONE = 11;
-  parameter BAD = 15;
+  parameter WAIT = 4'd0;
+  parameter START = 4'd1;
+  parameter ADDRESS = 4'd2;
+  parameter MODE = 4'd3;
+  parameter ADDRESS_ACK = 4'd4;
+  parameter WRITE_DATA = 4'd5;
+  parameter READ_DATA = 4'd6;
+  parameter WRITE_ACK = 4'd7;
+  parameter READ_ACK = 4'd8;
+  parameter READ_NACK = 4'd9;
+  parameter STOP = 4'd10;
+  parameter DONE = 4'd11;
+  parameter BAD = 4'd15;
 
   //tri-state buffer for sda and scl
   assign sda = (sda_en) ? sda_out ? 1'bz : 1'b0 : 1'bz;
@@ -70,7 +70,7 @@ module master(
     end
 
   //Datapath for the Moore state machine
-  always@(master_state or reset_n or master_counter)
+  always@(*)
     begin
       if( !reset_n )  //disable all tri-state buffers
         begin
@@ -96,7 +96,7 @@ module master(
             ADDRESS:  //Sends address out SDA line
               begin
                 sda_en <= 1;
-                sda_out <= address[6 - master_counter];
+                sda_out <= address[4'd6 - master_counter];
                 scl_en <= 1;
               end
             MODE:     //Sends mode out SDA line
@@ -114,7 +114,7 @@ module master(
             WRITE_DATA:     //Sends regiester MSB first
               begin
                 sda_en <= 1;
-                sda_out <= registor[7 - master_counter];
+                sda_out <= registor[8'd7 - master_counter];
                 scl_en <= 1;
               end
             READ_DATA:    //Reads data on SDA line MSB first
