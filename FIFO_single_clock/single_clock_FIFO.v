@@ -63,12 +63,12 @@ module test_controller();
       reset_n = 1;
       #10
       write_en = 1;
-      while(!full)
+      #200 // while(!full)
       #40
       write_en = 0;
       #20
       read_en = 1;
-      while(!empty)
+      #200//while(!empty)
       #100
       write_en = 1;
       #10
@@ -103,6 +103,7 @@ module FIFO_controller(
   reg [2:0] bin_write_pointer;
   reg [2:0] next_bin_read_pointer;
   reg [2:0] bin_read_pointer;
+  reg [1:0] write_state;
   integer i;
 
   assign full = (next_bin_write_pointer[2] != next_bin_read_pointer[2])&&(next_bin_write_pointer[1:0] == next_bin_read_pointer[1:0]) ? 1'b1 : 1'b0; 
@@ -120,25 +121,44 @@ module FIFO_controller(
           bin_write_pointer <= next_bin_write_pointer;
         end
     end
+  
 
   always@(posedge clock or negedge reset_n)
     begin
       if(!reset_n)
         begin
           next_bin_write_pointer <= 3'b0;
+          write_state <= 1'b0;
           data_ready <= 1'b0;
         end
       else
         begin
-          if(write_en & !full & !data_ready)
+          if(write_en)
             begin
-              next_bin_write_pointer <= next_bin_write_pointer + 1'b1;
-              data_ready <= 1'b1;
+              if(write_state == 1'b0 & !full)
+                begin
+                  data_ready <= 0'b0;
+                  write_state <= 1'b1;
+                  next_bin_write_pointer <= next_bin_write_pointer;
+                end
+              else if(write_state == 1'b1)
+                begin
+                  data_ready <= 1'b1;
+                  write_state <= 1'b0;
+                  next_bin_write_pointer <= next_bin_write_pointer + 1'b1;
+                end
+              else
+                begin
+                  next_bin_write_pointer <= next_bin_write_pointer;
+                  write_state <= 1'b0;
+                  next_bin_write_pointer <= next_bin_write_pointer;
+                end
             end
           else
             begin
               next_bin_write_pointer <= next_bin_write_pointer;
-              data_ready <= 1'b0;
+              write_state <= 1'b0;
+              next_bin_write_pointer <= next_bin_write_pointer;
             end
         end
     end
