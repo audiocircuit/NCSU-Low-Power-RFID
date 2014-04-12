@@ -16,7 +16,7 @@ module clock_divider(
         end
       else if( enabled )
         begin
-          if(counter == 5'd9)
+          if(counter == 5'd0)
             begin
               clk_div <= ~clk_div;
               counter <= 9'b0;
