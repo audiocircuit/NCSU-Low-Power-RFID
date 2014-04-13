@@ -245,13 +245,21 @@ module master(
             begin
               if(master_counter < 7)
                 begin
-                  master_state <= WRITE_DATA;
-                  master_counter <= master_counter + 1'b1;
+                  if(!mode)
+                    begin
+                      master_state <= WRITE_DATA;
+                      master_counter <= master_counter + 1'b1;
+                    end
+                  else
+                    begin
+                      master_state <= REPEAT_START;
+                      master_counter <= 5'd0;
+                    end
                 end
               else
                 begin
                   master_state <= WRITE_ACK;
-                  master_counter <= 1'b0;
+                  master_counter <= 5'b0;
                 end
             end
           WRITE_ACK:    //waits for ACK from slave on write
@@ -259,7 +267,7 @@ module master(
               if( sda_in || stop )
                 begin
                   master_state <= STOP;
-                  master_counter <= 1'b0;
+                  master_counter <= 5'b0;
                 end
               else
                 begin
