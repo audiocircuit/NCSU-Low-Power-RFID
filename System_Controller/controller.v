@@ -46,8 +46,8 @@ parameter WRITE_TO_USERMEM      = 8;
 parameter INCREMENT_SENSOR      = 9;
 
 //parameters for readability
-parameter I2C_WRITE             = 0;
-parameter I2C_READ              = 1;
+parameter I2C_WRITE             = 1'b0;
+parameter I2C_READ              = 1'b1;
 
 //define reg/wires
 reg [5:0] cstate, nstate;
@@ -65,38 +65,38 @@ end
 always@(*) begin
   case(cstate)
     RESET: begin
-      sensorAddr_I2C <= 0;
-      writeVal_I2C <= 0;
-      mode_I2C <= 0;
-      start_I2C <= 0;
-      we_userMem <= 0;
-      writeAddr_userMem <= 0;
-      writeBus_userMem <= 0;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
+      sensorAddr_I2C <= 7'b0;
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= 1'b0;
+      start_I2C <= 1'b0;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
       readAddr_EEPROM <= 16'b1_000_000000000000;
       sensorInfo[0] <= 16'b0;
       sensorInfo[1] <= 16'b0;
       sensorInfo[2] <= 16'b0;
       sensorInfo[3] <= 16'b0;
-      readSensor <= 0;
+      readSensor <= 2'b0;
       
       nstate <= GET_SENSOR0_INFO;
     end
     
     //Get Sensor0 Address, I2C Control Byte, and Default Sensor
     GET_SENSOR0_INFO: begin
-      sensorAddr_I2C <= 0;
-      writeVal_I2C <= 0;
-      mode_I2C <= 0;
-      start_I2C <= 0;
-      we_userMem <= 0;
-      writeAddr_userMem <= 0;
-      writeBus_userMem <= 0;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
+      sensorAddr_I2C <= 7'b0;
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= 1'b0;
+      start_I2C <= 1'b0;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
       readAddr_EEPROM <= 16'b1_001_000000000000;
       sensorInfo[0] <= readBus_EEPROM;
       sensorInfo[1] <= 16'b0;
@@ -109,16 +109,16 @@ always@(*) begin
 
     //Get Sensor1 Address, I2C Control Byte, and Default Sensor
     GET_SENSOR1_INFO: begin
-      sensorAddr_I2C <= 0;
-      writeVal_I2C <= 0;
-      mode_I2C <= 0;
-      start_I2C <= 0;
-      we_userMem <= 0;
-      writeAddr_userMem <= 0;
-      writeBus_userMem <= 0;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
+      sensorAddr_I2C <= 7'b0;
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= 1'b0;
+      start_I2C <= 1'b0;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
       readAddr_EEPROM <= 16'b1_010_000000000000;
       sensorInfo[0] <= sensorInfo[0];
       sensorInfo[1] <= readBus_EEPROM;
@@ -131,16 +131,16 @@ always@(*) begin
     
     //Get Sensor2 Address, I2C Control Byte, and Default Sensor
     GET_SENSOR2_INFO: begin
-      sensorAddr_I2C <= 0;
-      writeVal_I2C <= 0;
-      mode_I2C <= 0;
-      start_I2C <= 0;
-      we_userMem <= 0;
-      writeAddr_userMem <= 0;
-      writeBus_userMem <= 0;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
+      sensorAddr_I2C <= 7'b0;
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= 1'b0;
+      start_I2C <= 1'b0;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
       readAddr_EEPROM <= 16'b1_011_000000000000;
       sensorInfo[0] <= sensorInfo[0];
       sensorInfo[1] <= sensorInfo[1];
@@ -154,16 +154,16 @@ always@(*) begin
 
     //Get Sensor3 Address, I2C Control Byte, and Default Sensor
     GET_SENSOR3_INFO: begin
-      sensorAddr_I2C <= 0;
-      writeVal_I2C <= 0;
-      mode_I2C <= 0;
-      start_I2C <= 0;
-      we_userMem <= 0;
-      writeAddr_userMem <= 0;
-      writeBus_userMem <= 0;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
+      sensorAddr_I2C <= 7'b0;
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= 1'b0;
+      start_I2C <= 1'b0;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
       readAddr_EEPROM <= 16'b1_011_000000000000;
       sensorInfo[0] <= sensorInfo[0];
       sensorInfo[1] <= sensorInfo[1];
@@ -178,14 +178,14 @@ always@(*) begin
       sensorAddr_I2C <= sensorInfo[readSensor][7:1];
       writeVal_I2C <= sensorInfo[readSensor][15:8];
       mode_I2C <= I2C_WRITE;
-      start_I2C <= 1;
-      we_userMem <= 0;
-      writeAddr_userMem <= 0;
-      writeBus_userMem <= 0;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
-      readAddr_EEPROM <= 0;
+      start_I2C <= 1'b1;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
+      readAddr_EEPROM <= 16'b0;
       sensorInfo[0] <= sensorInfo[0];
       sensorInfo[1] <= sensorInfo[1];
       sensorInfo[2] <= sensorInfo[2];
@@ -197,16 +197,16 @@ always@(*) begin
 
     READ_SENSOR_VAL: begin
       sensorAddr_I2C <= sensorInfo[readSensor][7:1];
-      writeVal_I2C <= 0;
+      writeVal_I2C <= 8'b0;
       mode_I2C <= I2C_READ;
-      start_I2C <= 1;
-      we_userMem <= 0;
-      writeAddr_userMem <= 0;
-      writeBus_userMem <= 0;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
-      readAddr_EEPROM <= 0;
+      start_I2C <= 1'b1;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
+      readAddr_EEPROM <= 16'b0;
       sensorInfo[0] <= sensorInfo[0];
       sensorInfo[1] <= sensorInfo[1];
       sensorInfo[2] <= sensorInfo[2];
@@ -217,17 +217,17 @@ always@(*) begin
     end
 
     LOOKUP_SENSOR_VAL: begin
-      sensorAddr_I2C <= 0;
-      writeVal_I2C <= 0;
-      mode_I2C <= 0;
-      start_I2C <= 0;
-      we_userMem <= 0;
-      writeAddr_userMem <= 0;
-      writeBus_userMem <= 0;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
-      readAddr_EEPROM <= {0,readSensor,readVal_I2C};
+      sensorAddr_I2C <= 7'b0;
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= 1'b0;
+      start_I2C <= 1'b0;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
+      readAddr_EEPROM <= {6'b0,readSensor,readVal_I2C};
       sensorInfo[0] <= sensorInfo[0];
       sensorInfo[1] <= sensorInfo[1];
       sensorInfo[2] <= sensorInfo[2];
@@ -238,16 +238,16 @@ always@(*) begin
     end
 
     WRITE_TO_USERMEM: begin
-      sensorAddr_I2C <= 0;
-      writeVal_I2C <= 0;
-      mode_I2C <= 0;
-      start_I2C <= 0;
-      we_userMem <= 1;
+      sensorAddr_I2C <= 7'b0;
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= 1'b0;
+      start_I2C <= 1'b0;
+      we_userMem <= 1'b1;
       writeAddr_userMem <= readSensor;
       writeBus_userMem <= readBus_EEPROM[15:0];
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
       readAddr_EEPROM <= readAddr_EEPROM;
       sensorInfo[0] <= sensorInfo[0];
       sensorInfo[1] <= sensorInfo[1];
@@ -259,22 +259,22 @@ always@(*) begin
     end
 
     INCREMENT_SENSOR: begin
-      sensorAddr_I2C <= 0;
-      writeVal_I2C <= 0;
-      mode_I2C <= 0;
-      start_I2C <= 0;
-      we_userMem <= 1;
+      sensorAddr_I2C <= 7'b0;
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= 1'b0;
+      start_I2C <= 1'b0;
+      we_userMem <= 1'b1;
       writeAddr_userMem <= writeAddr_userMem;
       writeBus_userMem <= writeBus_userMem;
-      we_EEPROM <= 0;
-      writeAddr_EEPROM <= 0;
-      writeBus_EEPROM <= 0;
+      we_EEPROM <= 1'b0;
+      writeAddr_EEPROM <= 16'b0;
+      writeBus_EEPROM <= 16'b0;
       readAddr_EEPROM <= readAddr_EEPROM;
       sensorInfo[0] <= sensorInfo[0];
       sensorInfo[1] <= sensorInfo[1];
       sensorInfo[2] <= sensorInfo[2];
       sensorInfo[3] <= sensorInfo[3];
-      readSensor <= readSensor + 1;
+      readSensor <= readSensor + 1'b1;
 
       nstate <= WRITE_SENSOR_CB_READ;
     end
