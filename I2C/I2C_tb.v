@@ -27,10 +27,10 @@ module test();
       reset_n = 1;
       start = 0;
       stop = 0;
-      mode = 1;
+      mode = 0;
       address = 7'b1110000;
-      regist = 8'b11110000;
-      mess = 8'b00001111;
+      regist = 8'b01010101;
+      mess = 8'b10101010;
       #20
       reset_n = 0;
       #20
@@ -39,10 +39,12 @@ module test();
       en = 1;
       #20
       start = 1;
+      #160
+      mode = 0;
       #400
       start = 0;
       stop = 1;
-      #100
+      #200
       $finish;
     end
 

@@ -1,3 +1,5 @@
+
+
 module slave(
   input wire reset_n,
   input wire en,
@@ -17,6 +19,7 @@ module slave(
   reg sda_out;
   reg sda_en;
   reg sda_in;
+  reg repeat_start;
 
   parameter WAIT = 0;
   parameter ADDRESS = 1;
@@ -42,6 +45,10 @@ module slave(
             begin
               start <= 1;
             end
+          else if( start & !stop )
+            begin
+              start <= 1;
+            end
           else
             begin
               start <= 0;
@@ -49,6 +56,25 @@ module slave(
         end
     end
 
+  always@(negedge sda or negedge reset_n)
+    begin
+      if(!reset_n)
+        begin
+          repeat_start <= 0;
+        end
+      else
+        begin
+          if( scl & start )
+            begin
+              repeat_start <= 1;
+            end
+          else
+            begin
+              repeat_start <= 0;
+            end
+        end
+    end
+    
   always@(posedge sda or negedge reset_n)
     begin
       if(!reset_n)
@@ -131,7 +157,7 @@ module slave(
               begin
                 sda_en <= 0;
                 sda_out <= 0;
-                address <= address;
+                address <= 7'd0;
                 data_in <= 8'b0;
                 mode <= mode;               
               end
@@ -139,7 +165,7 @@ module slave(
               begin
                 sda_en <= 0;
                 sda_out <= 0;
-                address <= address;
+                address <= {address, sda_in};
                 data_in <= {data_in, sda_in};
                 mode <= mode;               
               end
@@ -244,7 +270,12 @@ module slave(
               end
             READ_DATA:
               begin
-                if(slave_counter < 7)
+                if( repeat_start )
+                  begin
+                    slave_state <= ADDRESS;
+                    slave_counter = 0;
+                  end
+                else if(slave_counter < 7)
                   begin
                     slave_state <= READ_DATA;
                     slave_counter <= slave_counter + 1;
