@@ -30,7 +30,7 @@ module controller(
   output reg we_EEPROM,
   output reg [15:0]writeAddr_EEPROM,
   output reg [15:0]writeBus_EEPROM,
-  output reg [17:0]readAddr_EEPROM
+  output reg [15:0]readAddr_EEPROM
 );
 
 //parameters for state machine
