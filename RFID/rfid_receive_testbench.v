@@ -1,12 +1,16 @@
 
 module rfid_receive_testbench();
   reg UL_clock = 1;
+  reg clock = 1;
   reg reset_n = 1;
   reg UL_data;
   wire [127:0] packet;
   wire packet_rdy;
-  wire op_size;
+  wire [1:0]op_size;
   reg clk_enable = 0;
+  wire [7:0] command_code;
+  wire new_packet;
+  wire [119:0] data;
   integer i;
 
   rfid_receive rec(
@@ -18,12 +22,15 @@ module rfid_receive_testbench();
     .op_size(op_size)
     );
 
-  rfid_decode(
-    .clock(UL_clock),
+  rfid_decode decode(
+    .clock(clock),
     .reset_n(reset_n),
     .input_in(packet),
     .op_code(op_size),
-    .packet_rdy(packet_rdy)
+    .packet_rdy(packet_rdy),
+    .command(command_code),
+    .new_packet(new_packet),
+    .data_out(data)
     );
 
     always@(*)
@@ -34,7 +41,8 @@ module rfid_receive_testbench();
           #5 UL_clock <= 0;
       end
 
-
+    always@(*)
+     #5 clock <= ~clock;
 
     initial
       begin

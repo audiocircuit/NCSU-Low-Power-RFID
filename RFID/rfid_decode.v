@@ -3,15 +3,18 @@ module rfid_decode(
   input wire reset_n,
   input wire [127:0] input_in,
   input wire [1:0] op_code,
-  input wire packet_rdy
+  input wire packet_rdy,
+  output reg [7:0] command,
+  output reg new_packet,
+  output reg [119:0] data_out
   );
 
   reg [127:0] data_in;
   reg  state;
   reg [1:0] command_code;
 
-  parameter WAIT_HIGH =       1'b0;
-  parameter WAIT_LOW =        1'b1;
+  parameter WAIT_HIGH =       1'b1;
+  parameter WAIT_LOW =        1'b0;
 /*
   parameter Query =       4'b1000;
   parameter QueryRep =    2'b00;
@@ -30,12 +33,14 @@ module rfid_decode(
           data_in <= 128'd0;
           command_code <= 2'd0;
           state <= WAIT_LOW;
+          new_packet <= 1'd0;
         end
       else
         begin
           case(state)
             WAIT_LOW:
               begin
+                new_packet <= 1'd0;
                 data_in <= data_in;
                 command_code <= command_code;
                 if(packet_rdy)
@@ -54,20 +59,46 @@ module rfid_decode(
                     state <= WAIT_HIGH;
                     data_in <= data_in;
                     command_code <= command_code;
+                    new_packet <= 1'd0;
                   end
                 else
                   begin
                     state <= WAIT_LOW;
                     data_in <= input_in;
                     command_code <= op_code;
+                    new_packet <= 1'd1;
                   end
               end
           endcase
         end
     end
 
+  always@(*)
+    begin
+      case(command_code)
+        2'd0:
+          begin
+            command <= data_in[127:126];
+            data_out <= data_in[125:0];
+          end
+        2'd1:
+          begin
+            command <= data_in[127:124];
+            data_out <= data_in[123:0];
+          end
+        2'd2:
+          begin
+            command <= data_in[127:120];
+            data_out <= data_in[119:0];
+          end
+        default:
+          begin
+            command <= 8'd0;
+            command <= 120'd0;
+          end
 
-
+      endcase
+    end
 
 endmodule
 
