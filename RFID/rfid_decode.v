@@ -1,12 +1,18 @@
 module rfid_decode(
+  input wire clock,
+  input wire reset_n,
   input wire [127:0] input_in,
-
-
-
+  input wire [1:0] op_code,
+  input wire packet_rdy
   );
 
+  reg [127:0] data_in;
+  reg  state;
+  reg [1:0] command_code;
 
-
+  parameter WAIT_HIGH =       1'b0;
+  parameter WAIT_LOW =        1'b1;
+/*
   parameter Query =       4'b1000;
   parameter QueryRep =    2'b00;
   parameter QueryAdjust = 4'b1001;
@@ -15,6 +21,70 @@ module rfid_decode(
   parameter ReqRN =       8'b11000001;
   parameter Read =        4'b11000010;
   parameter Query =       4'b1000;
+*/
+
+  always@(posedge clock or negedge reset_n)
+    begin
+      if(!reset_n)
+        begin
+          data_in <= 128'd0;
+          command_code <= 2'd0;
+          state <= WAIT_LOW;
+        end
+      else
+        begin
+          case(state)
+            WAIT_LOW:
+              begin
+                data_in <= data_in;
+                command_code <= command_code;
+                if(packet_rdy)
+                  begin
+                    state <= WAIT_HIGH;
+                  end
+                else
+                  begin
+                    state <= WAIT_LOW;
+                  end
+              end
+            WAIT_HIGH:
+              begin
+                if(packet_rdy)
+                  begin
+                    state <= WAIT_HIGH;
+                    data_in <= data_in;
+                    command_code <= command_code;
+                  end
+                else
+                  begin
+                    state <= WAIT_LOW;
+                    data_in <= input_in;
+                    command_code <= op_code;
+                  end
+              end
+          endcase
+        end
+    end
+
+
+
+
+endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
