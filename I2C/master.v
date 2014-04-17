@@ -310,13 +310,29 @@ module master(
             end 
           DONE:       //completes transmission of Stop bit
             begin
-              master_state <= DONE;
-              master_counter <= 1'b0;
+              if(start)
+                begin
+                  master_state <= DONE;
+                  master_counter <= 1'b0;
+                end
+              else
+                begin
+                  master_state <= WAIT;
+                  master_counter <= 1'b0;
+                end
             end
           BAD:        //State for BAD data
             begin
-              master_state <= BAD;
-              master_counter <= 1'b0;
+              if(start)
+                begin
+                  master_state <= BAD;
+                  master_counter <= 1'b0;
+                end
+              else
+                begin
+                  master_state <= WAIT;
+                  master_counter <= 1'b0;
+                end
             end
           REPEAT_START:
             begin
