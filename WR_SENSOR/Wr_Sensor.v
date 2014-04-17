@@ -26,6 +26,11 @@ module Wr_Sensor(
   parameter READ_VALUE = 4'd7;
   parameter READ = 4'd8;
   parameter READ_ACK = 4'd9;
+  parameter READ_STOP = 4'd12;
+  parameter WRITE_STOP = 4'd13;
+  parameter READ_ACK_STOP = 4'd10;
+  parameter WRITE_ACK_STOP = 4'd11;
+  parameter WAIT = 4'd14;
 
   reg [3:0] state;
   reg [4:0] count;
@@ -76,7 +81,7 @@ module Wr_Sensor(
             master_mode <= 1'd0;
             write_slave_data <= 8'd0;
             slave_addr <= 7'd0;
-            data_ready <= 1'd0;
+            data_ready <= 1'd1;
           end
         WRITE: 
           begin
@@ -89,6 +94,17 @@ module Wr_Sensor(
             slave_addr <= 7'd0;
             data_ready <= 1'd0;
           end
+        WRITE_STOP: 
+          begin
+            read_val <= 8'd0;
+            master_en <= 1'd1;
+            master_start <= 1'd0;
+            master_stop <= 1'd1;
+            master_mode <= 1'd0;
+            write_slave_data <= write_val;
+            slave_addr <= 7'd0;
+            data_ready <= 1'd0;
+          end
         WRITE_ACK: 
           begin
             read_val <= 8'd0;
@@ -96,9 +112,20 @@ module Wr_Sensor(
             master_start <= 1'd1;
             master_stop <= 1'd0;
             master_mode <= 1'd0;
-            write_slave_data <= 8'd0;
+            write_slave_data <= write_val;
             slave_addr <= 7'd0;
-            data_ready <= 1'd0;
+            data_ready <= 1'd1;
+          end
+        WRITE_ACK_STOP: 
+          begin
+            read_val <= 8'd0;
+            master_en <= 1'd1;
+            master_start <= 1'd0;
+            master_stop <= 1'd1;
+            master_mode <= 1'd0;
+            write_slave_data <= write_val;
+            slave_addr <= 7'd0;
+            data_ready <= 1'd1;
           end
         READ_ADDR: 
           begin
@@ -124,10 +151,43 @@ module Wr_Sensor(
           end
         READ_ACK: 
           begin
-            read_val <= 8'd0;
+            read_val <= read_val;
             master_en <= 1'd1;
             master_start <= 1'd1;
             master_stop <= 1'd0;
+            master_mode <= 1'd1;
+            write_slave_data <= 8'd0;
+            slave_addr <= 7'd0;
+            data_ready <= 1'd1;
+          end
+        READ_ACK_STOP: 
+          begin
+            read_val <= read_val;
+            master_en <= 1'd1;
+            master_start <= 1'd1;
+            master_stop <= 1'd1;
+            master_mode <= 1'd1;
+            write_slave_data <= 8'd0;
+            slave_addr <= 7'd0;
+            data_ready <= 1'd1;
+          end
+        READ_STOP: 
+          begin
+            read_val <= read_slave_data;
+            master_en <= 1'd1;
+            master_start <= 1'd1;
+            master_stop <= 1'd1;
+            master_mode <= 1'd1;
+            write_slave_data <= 8'd0;
+            slave_addr <= 7'd0;
+            data_ready <= 1'd0;
+          end
+        WAIT: 
+          begin
+            read_val <= read_val;
+            master_en <= 1'd1;
+            master_start <= 1'd0;
+            master_stop <= 1'd1;
             master_mode <= 1'd1;
             write_slave_data <= 8'd0;
             slave_addr <= 7'd0;
@@ -193,7 +253,7 @@ module Wr_Sensor(
               end
             WRITE_CONTROL:
               begin
-                if(count == 5'd15)
+                if(count == 5'd16)
                   begin
                     count <= 5'd0;
                     state <= WRITE_CONTROL_ACK;
@@ -231,10 +291,28 @@ module Wr_Sensor(
                     count <= 5'd0;
                     state <= WRITE_ACK;
                   end
+                else if(count == 5'd13 & ! start)
+                  begin
+                    count <= 5'd0;
+                    state <= WRITE_STOP;
+                  end
                 else
                   begin
                     count <= count + 1'd1;
                     state <= WRITE;
+                  end
+              end
+            WRITE_STOP:
+              begin
+                if(!count[0])
+                  begin
+                    count <= count + 1'd1;
+                    state <= WRITE_STOP;
+                  end
+                else
+                  begin
+                    count <= 5'd0;
+                    state <= WRITE_ACK_STOP;
                   end
               end
             WRITE_ACK:
@@ -246,21 +324,26 @@ module Wr_Sensor(
                   end
                 else
                   begin
-                    if(!start)
-                      begin
-                        count <= 5'd0;
-                        state <= IDLE;
-                      end
-                    else
-                      begin
-                        count <= 5'd0;
-                        state <= WRITE;
-                      end
+                    count <= 5'd0;
+                    state <= WRITE;
+                  end
+              end
+            WRITE_ACK_STOP:
+              begin
+                if(!count[0])
+                  begin
+                    count <= count + 1'd1;
+                    state <= WRITE_ACK_STOP;
+                  end
+                else
+                  begin
+                    count <= 5'd0;
+                    state <= WAIT;
                   end
               end
             READ_ADDR:
               begin
-                if(count == 5'd17)
+                if(count == 5'd25)
                   begin
                     count <= 5'd0;
                     state <= READ;
@@ -278,6 +361,11 @@ module Wr_Sensor(
                     count <= 5'd0;
                     state <= READ_ACK;
                   end
+                else if((count == 5'd13) & ! start )
+                  begin
+                    count <= 5'd0;
+                    state <= READ_STOP;
+                  end
                 else
                   begin
                     count <= count + 1'd1;
@@ -293,16 +381,47 @@ module Wr_Sensor(
                   end
                 else
                   begin
-                    if(!start)
-                      begin
-                        count <= 5'd0;
-                        state <= IDLE;
-                      end
-                    else
-                      begin
-                        count <= 5'd0;
-                        state <= READ;
-                      end
+                    count <= 5'd0;
+                    state <= READ;
+                  end
+              end
+            READ_ACK_STOP:
+              begin
+                if(!count[0])
+                  begin
+                    count <= count + 1'd1;
+                    state <= READ_ACK_STOP;
+                  end
+                else
+                  begin
+                    count <= 5'd0;
+                    state <= WAIT;
+                  end
+              end
+            READ_STOP:
+              begin
+                if(!count[0])
+                  begin
+                    count <= count + 1'd1;
+                    state <= READ_STOP;
+                  end
+                else
+                  begin
+                    count <= 5'd0;
+                    state <= READ_ACK_STOP;
+                  end
+              end
+            WAIT:
+              begin
+                if(!count[0])
+                  begin
+                    count <= count + 1'd1;
+                    state <= WAIT;
+                  end
+                else
+                  begin
+                    count <= 5'd0;
+                    state <= IDLE;
                   end
               end
           endcase
