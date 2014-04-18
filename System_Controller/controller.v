@@ -31,10 +31,11 @@ parameter GET_SENSOR1_INFO      = 2;
 parameter GET_SENSOR2_INFO      = 3;
 parameter GET_SENSOR3_INFO      = 4;
 parameter WRITE_SENSOR_CB_READ  = 5;
-parameter READ_SENSOR_VAL       = 6;
-parameter LOOKUP_SENSOR_VAL     = 7;
-parameter WRITE_TO_USERMEM      = 8;
-parameter INCREMENT_SENSOR      = 9;
+parameter START_READ_SENSOR_VAL = 6;
+parameter READ_SENSOR_VAL       = 7;
+parameter LOOKUP_SENSOR_VAL     = 8;
+parameter WRITE_TO_USERMEM      = 9;
+parameter INCREMENT_SENSOR      = 10;
 
 //parameters for readability
 parameter I2C_WRITE             = 1'b0;
@@ -111,10 +112,19 @@ always@(posedge clock or negedge rst_n) begin
         sensorInfo[2] <= sensorInfo[2];
         sensorInfo[3] <= sensorInfo[3];
         if(dataRdy_I2C) begin
-          state <= READ_SENSOR_VAL;
+          state <= START_READ_SENSOR_VAL;
         end else begin
           state <= WRITE_SENSOR_CB_READ;
         end
+      end
+      
+      START_READ_SENSOR_VAL: begin
+        readSensor <= readSensor + 1'b0;
+        sensorInfo[0] <= sensorInfo[0];
+        sensorInfo[1] <= sensorInfo[1];
+        sensorInfo[2] <= sensorInfo[2];
+        sensorInfo[3] <= sensorInfo[3];
+        state <= READ_SENSOR_VAL;
       end
 
       READ_SENSOR_VAL: begin
@@ -222,6 +232,18 @@ always@(*) begin
       sensorAddr_I2C <= sensorInfo[readSensor][7:1];
       writeVal_I2C <= sensorInfo[readSensor][15:8];
       mode_I2C <= I2C_WRITE;
+      start_I2C <= 1'b1;
+      we_userMem <= 1'b0;
+      writeAddr_userMem <= 16'b0;
+      writeBus_userMem <= 16'b0;
+      readAddr_userMem <= 16'b0;
+    end
+
+
+    START_READ_SENSOR_VAL: begin
+      sensorAddr_I2C <= sensorInfo[readSensor][7:1];
+      writeVal_I2C <= 8'b0;
+      mode_I2C <= I2C_READ;
       start_I2C <= 1'b1;
       we_userMem <= 1'b0;
       writeAddr_userMem <= 16'b0;
