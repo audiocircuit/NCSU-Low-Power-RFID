@@ -8,8 +8,8 @@ module Sensor_top(
   input wire [7:0] write_val,
   output wire data_ready,
   output wire [7:0] read_val,
-  inout tri1 master_sda_line,
-  inout tri1 master_scl_line
+  inout wire master_sda_line,
+  inout wire master_scl_line
   );
   
   wire master_enable, master_clock, master_start, master_stop;
